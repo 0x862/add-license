@@ -264,7 +264,15 @@ func addLicense(path string, fmode os.FileMode, tmpl *template.Template, data li
 		}
 		lic = append(line, lic...)
 	}
-	b = append(lic, b...)
+	
+	utf8bom := []byte{0xef, 0xbb, 0xbf}
+	if b[0] == utf8bom[0] && b[1] == utf8bom[1] && b[2] == utf8bom[2] {
+		b = append(lic, b[3:]...)
+		b = append(utf8bom, b...)
+	} else {
+		b = append(lic, b...)
+	}
+	
 	return true, ioutil.WriteFile(path, b, fmode)
 }
 
